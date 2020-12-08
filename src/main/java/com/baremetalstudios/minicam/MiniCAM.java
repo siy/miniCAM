@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2014, 2015 Sergiy Yevtushenko
+ * Copyright (c) 2014, 2015, 2020 Sergiy Yevtushenko
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,7 @@
 package com.baremetalstudios.minicam;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -179,11 +180,22 @@ public class MiniCAM {
     }
 
     private void cleanup() {
-        Util.close(drillStream);
-        Util.close(outlineStream);
-        Util.close(configReader);
-        Util.close(out);
-        Util.close(outDrill);
-        Util.close(outMill);
+        close(drillStream);
+        close(outlineStream);
+        close(configReader);
+        close(out);
+        close(outDrill);
+        close(outMill);
     }
+
+    private static void close(Closeable closeable) {
+        if (closeable != null) {
+            try {
+                closeable.close();
+            } catch (IOException e) {
+                // do nothing
+            }
+        }
+    }
+
 }

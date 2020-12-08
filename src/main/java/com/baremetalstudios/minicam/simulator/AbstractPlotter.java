@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2014, 2015 Sergiy Yevtushenko
+ * Copyright (c) 2014, 2015, 2020 Sergiy Yevtushenko
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,15 +15,15 @@
  ******************************************************************************/
 package com.baremetalstudios.minicam.simulator;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public abstract class AbstractPlotter implements Plotter {
-    private final Logger logger = LoggerFactory.getLogger(AbstractPlotter.class);
+    private final Logger logger = LogManager.getLogger();
     
     private ExposureMode exposure = SimulatorDefaults.EXPOSURE;
     private final EnumSet<PlotterMode> opts = SimulatorDefaults.OPTIONS;

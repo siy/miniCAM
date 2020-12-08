@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2014, 2015 Sergiy Yevtushenko
+ * Copyright (C) 2014, 2015, 2020 Sergiy Yevtushenko
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,9 +21,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.baremetalstudios.minicam.simulator.ApertureType;
 import com.baremetalstudios.minicam.simulator.BinaryOperation;
 import com.baremetalstudios.minicam.simulator.ExposureMode;
@@ -39,9 +36,11 @@ import com.baremetalstudios.minicam.simulator.Plotter;
 import com.baremetalstudios.minicam.simulator.PlotterMode;
 import com.baremetalstudios.minicam.simulator.SimpleAperture;
 import com.baremetalstudios.minicam.simulator.SimpleMacroPrimitive;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Parser implements ParserConstants {
-    private final static Logger LOG = LoggerFactory.getLogger(Parser.class);
+    private final static Logger LOG = LogManager.getLogger();
 
     public static final int HALT = 0;
     public static final int OPTSTOP = 1;
@@ -642,8 +641,9 @@ public class Parser implements ParserConstants {
                 throw new ParseException();
         }
         jj_consume_token(CODE_DELIM);
-        if (!"AS".equals(e.image) && !"IS".equals(e.image))
-            LOG.warn("Unsupported image encoding \u005c"" + e.image + "\u005c"");
+        if (!"AS".equals(e.image) && !"IS".equals(e.image)) {
+            LOG.warn("Unsupported image encoding {}", e.image);
+        }
     }
 
     final public void AxisSelect() throws ParseException {
@@ -676,7 +676,6 @@ public class Parser implements ParserConstants {
                 throw new ParseException();
         }
         jj_consume_token(CODE_DELIM);
-        //LOG.warn("Ignoring axis select ASA" + a.image + "B" + b.image);
         simulator.selectAxis(a.image, b.image);
     }
 
@@ -748,7 +747,7 @@ public class Parser implements ParserConstants {
                 jj_consume_token(38);
                 fmt = jj_consume_token(DIGITS);
                 if (fmt.image.length() != 2) {
-                    LOG.warn("Ignoring bad X format, not 2 digits: " + fmt);
+                    LOG.warn("Ignoring bad X format, not 2 digits: {}", fmt);
                 } else {
                     simulator.setFormatX(Integer.parseInt(fmt.image.substring(0, 1)), Integer.parseInt(fmt.image.substring(1, 2)));
                 }
@@ -761,7 +760,7 @@ public class Parser implements ParserConstants {
                 jj_consume_token(39);
                 fmt = jj_consume_token(DIGITS);
                 if (fmt.image.length() != 2) {
-                    LOG.warn("Ignoring bad Y format, not 2 digits: " + fmt);
+                    LOG.warn("Ignoring bad Y format, not 2 digits: {}", fmt);
                 } else {
                     simulator.setFormatY(Integer.parseInt(fmt.image.substring(0, 1)), Integer.parseInt(fmt.image.substring(1, 2)));
                 }
@@ -801,7 +800,7 @@ public class Parser implements ParserConstants {
         jj_consume_token(IN);
         name = jj_consume_token(TEXT);
         jj_consume_token(CODE_DELIM);
-        LOG.info("image name: " + name.image);
+        LOG.info("image name: {}", name.image);
     }
 
     final public void ImagePolarity() throws ParseException {
@@ -820,7 +819,6 @@ public class Parser implements ParserConstants {
                 throw new ParseException();
         }
         jj_consume_token(CODE_DELIM);
-        //LOG.warn("Ignoring image polarity IP" + polarity.image);
         simulator.setImagePolarity(polarity.image);
     }
 
@@ -829,7 +827,7 @@ public class Parser implements ParserConstants {
         jj_consume_token(LN);
         name = jj_consume_token(TEXT);
         jj_consume_token(CODE_DELIM);
-        LOG.info("layer name: " + name.image);
+        LOG.info("layer name: {}", name.image);
     }
 
     final public void LayerPolarity() throws ParseException {
@@ -848,7 +846,6 @@ public class Parser implements ParserConstants {
                 throw new ParseException();
         }
         jj_consume_token(CODE_DELIM);
-        //LOG.warn("Ignoring layer polarity LP" + polarity.image);
         simulator.setLayerPolarity(polarity.image);
     }
 
@@ -891,7 +888,6 @@ public class Parser implements ParserConstants {
                 jj_la1[41] = jj_gen;
         }
         jj_consume_token(CODE_DELIM);
-        //LOG.warn("Ignoring offset OF" + ((!Double.isNaN(a)) ? ("A" + a) : "") + ((!Double.isNaN(b)) ? ("B" + b) : ""));
         simulator.setOffset(!Double.isNaN(a) ? ("A" + a) : "", !Double.isNaN(b) ? ("B" + b) : "");
     }
 
@@ -915,7 +911,6 @@ public class Parser implements ParserConstants {
                 jj_la1[43] = jj_gen;
         }
         jj_consume_token(CODE_DELIM);
-        //LOG.warn("Ignoring scale factor SF" + ((!Double.isNaN(a)) ? ("A" + a) : "") + ((!Double.isNaN(b)) ? ("B" + b) : ""));
         simulator.setScaleFactor(!Double.isNaN(a) ? ("A" + a) : "", !Double.isNaN(b) ? ("B" + b) : "");
     }
 
@@ -958,8 +953,6 @@ public class Parser implements ParserConstants {
                 jj_la1[47] = jj_gen;
         }
         jj_consume_token(CODE_DELIM);
-//        LOG.warn("Ignoring step and repeat SR" + ((x != null) ? ("X" + x.image) : "") + ((y != null) ? ("Y" + y.image) : "")
-//                        + ((!Double.isNaN(i)) ? ("I" + i) : "") + ((!Double.isNaN(j)) ? ("J" + j) : ""));
         simulator.stepAndRepeat((x != null) ? ("X" + x.image) : "", (y != null) ? ("Y" + y.image) : "",
                         (!Double.isNaN(i)) ? ("I" + i) : "", (!Double.isNaN(j)) ? ("J" + j) : "");
     }
@@ -1001,17 +994,17 @@ public class Parser implements ParserConstants {
             try {
                 simulator.addAperture(new MacroAperture(Integer.parseInt(number.image), simulator.getMacro(type), modifiers));
             } catch (NoSuchElementException e) {
-                LOG.warn("Ignoring aperture definition on line " + number.beginLine + " which references unknown aperture macro \u005c""
-                                + type + "\u005c"");
+                LOG.warn("Ignoring aperture definition on line {} which references unknown aperture macro {}", number.beginLine, type);
             }
         }
     }
 
     private void validateModifiersSize(String string, List<Double> modifiers, Token number, int lower, int upper) {
         if (modifiers.size() <= lower) {
-            LOG.warn("Ignoring " + string + " aperture with " + (lower == 0 ? "no" : " < " + (lower + 1)) + " modifiers on line " + number.beginLine);
+            LOG.warn("Ignoring {} aperture with {} modifiers on line {}",
+                     string, (lower == 0 ? "no" : " < " + (lower + 1)), number.beginLine);
         } else if (modifiers.size() > upper) {
-            LOG.warn("Ignoring " + string + " aperture with extra modifiers on line " + number.beginLine);
+            LOG.warn("Ignoring {} aperture with extra modifiers on line {}", string, number.beginLine);
         }
     }
 
@@ -1026,7 +1019,7 @@ public class Parser implements ParserConstants {
             default:
                 jj_la1[49] = jj_gen;
         }
-        list.add(0, new Double(modifier));
+        list.add(0, modifier);
     }
 
     final public void ApertureMacro() throws ParseException {
@@ -1077,9 +1070,7 @@ public class Parser implements ParserConstants {
                     case 1: {
                         return new SimpleMacroPrimitive(MacroPrimitiveType.CIRCLE, exprs);
                     }
-                    case 2: {
-                        return new SimpleMacroPrimitive(MacroPrimitiveType.LINE_VECTOR, exprs);
-                    }
+                    case 2:
                     case 20: {
                         return new SimpleMacroPrimitive(MacroPrimitiveType.LINE_VECTOR, exprs);
                     }
@@ -1105,7 +1096,7 @@ public class Parser implements ParserConstants {
                         return new SimpleMacroPrimitive(MacroPrimitiveType.THERMAL, exprs);
                     }
                     default:
-                        LOG.warn("Ignoring unknown macro primitive type " + primitiveNumber);
+                        LOG.warn("Ignoring unknown macro primitive type {}", primitiveNumber);
 
                         return null;
                 }

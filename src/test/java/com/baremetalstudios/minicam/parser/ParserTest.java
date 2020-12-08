@@ -3,12 +3,13 @@ package com.baremetalstudios.minicam.parser;
 
 import static org.junit.Assert.assertEquals;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 
 import org.junit.Test;
 
-import com.baremetalstudios.minicam.Util;
 import com.baremetalstudios.minicam.simulator.OutlinePlotter;
 
 public class ParserTest {
@@ -25,8 +26,14 @@ public class ParserTest {
             parser.Input();
             assertEquals(1075, simulator.getCounter());
         } finally {
-            Util.close(outlineStream);
-        }
+			if (outlineStream != null) {
+				try {
+					((Closeable) outlineStream).close();
+				} catch (IOException e) {
+					// do nothing
+				}
+			}
+		}
     }
 
     @Test
@@ -42,11 +49,21 @@ public class ParserTest {
             parser.Input();
             assertEquals(55731, simulator.getCounter());
         } finally {
-            Util.close(outlineStream);
-        }
+			close(outlineStream);
+		}
     }
-    
-    static class TestOutlinePlotter extends OutlinePlotter {
+
+	private static void close(FileInputStream outlineStream) {
+		if (outlineStream != null) {
+			try {
+				outlineStream.close();
+			} catch (IOException e) {
+				// do nothing
+			}
+		}
+	}
+
+	static class TestOutlinePlotter extends OutlinePlotter {
         private int counter = 0;
         @Override
         public void setCenter(String string, String string2) {

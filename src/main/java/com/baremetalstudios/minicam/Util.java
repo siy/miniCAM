@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2014, 2015 Sergiy Yevtushenko
+ * Copyright (c) 2014, 2015, 2020 Sergiy Yevtushenko
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,13 +22,4 @@ public final class Util {
     private Util() {
     }
 
-    public static void close(Closeable closeable) {
-        if (closeable != null) {
-            try {
-                closeable.close();
-            } catch (IOException e) {
-                // do nothing
-            }
-        }
-    }
 }

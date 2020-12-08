@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2014, 2015 Sergiy Yevtushenko
+ * Copyright (c) 2014, 2015, 2020 Sergiy Yevtushenko
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,7 @@
 package com.baremetalstudios.minicam.simulator;
 
 public class MacroConstant implements MacroExpression {
-
-    private double value;
+    private final double value;
 
     public MacroConstant(double value) {
         this.value = value;

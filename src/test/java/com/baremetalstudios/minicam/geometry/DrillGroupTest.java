@@ -2,6 +2,7 @@ package com.baremetalstudios.minicam.geometry;
 
 import static org.junit.Assert.assertTrue;
 
+import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -9,13 +10,11 @@ import java.util.List;
 
 import org.junit.Test;
 
-import com.baremetalstudios.minicam.Util;
 import com.baremetalstudios.minicam.config.OutputConfig;
 import com.baremetalstudios.minicam.parser.ExcellonParser;
 
 
 public class DrillGroupTest {
-
     //TODO: not a real test!!!
     @Test
     public void testOptimize() throws Exception {
@@ -36,7 +35,17 @@ public class DrillGroupTest {
         } catch (IOException e) {
             return null;
         } finally {
-            Util.close(drillStream);
+            close(drillStream);
+        }
+    }
+
+    private static void close(FileInputStream drillStream) {
+        if (drillStream != null) {
+            try {
+                drillStream.close();
+            } catch (IOException e) {
+                // do nothing
+            }
         }
     }
 }

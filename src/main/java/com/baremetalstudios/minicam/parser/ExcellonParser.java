@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2014, 2015 Sergiy Yevtushenko
+ * Copyright (c) 2014, 2015, 2020 Sergiy Yevtushenko
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,20 @@
  ******************************************************************************/
 package com.baremetalstudios.minicam.parser;
 
-import java.io.*;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import com.baremetalstudios.minicam.geometry.DrillGroup;
 import com.baremetalstudios.minicam.geometry.Point;
 import com.baremetalstudios.minicam.simulator.FormatParser;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class ExcellonParser {
     private static final Pattern METRIC_PATTERN = Pattern.compile("METRIC(\\s+)?(0+)\\.(0+).*");

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright 2014, 2015 Sergiy Yevtushenko
+ * Copyright (c) 2014, 2015, 2020 Sergiy Yevtushenko
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,13 @@ package com.baremetalstudios.minicam.simulator;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.baremetalstudios.minicam.geometry.Point;
 import com.baremetalstudios.minicam.geometry.Polygon;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class OutlinePlotter extends AbstractPlotter {
-    protected final Logger logger = LoggerFactory.getLogger(OutlinePlotter.class);
+    protected final Logger logger = LogManager.getLogger();
     
     private List<Point> points = new ArrayList<>();
     private List<Polygon> polygons = new ArrayList<>();
