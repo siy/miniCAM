@@ -1,154 +1,157 @@
-## MiniCAM 1.3.0
+## MiniCAM 2.0.0
 
-This utility is intended for generation of G-Code programs for CNC mill for cutting board outline and drilling.
-Unlike vast majority of the similar utilities it does not prepare anything for PCB track milling. Instead it is
-targeted to preparation of the board for photoresist processing (optionally with through hole plating). So, it
-takes outline Gerber and Excellon-like drill files and generates control file for CNC to prepare board(s) in
-single step - mill outlines with routing tabs and then drill all holes.
+G-Code generator for CNC mill PCB outline cutting and drilling. Takes Gerber outline and Excellon drill files, produces G-Code to prepare boards for photoresist processing in a single step: mill outlines with routing tabs, then drill all holes.
 
-Features:
+### Features
 
-- Single step processing - mill then drill and panel is ready for further processing, no need to install
-  it to CNC again.
-- Support for multiple boards at single panel (tested gerbers from GerbMerge output).
-- Automatic tool diameter compensation.
-- Automatic tab routing with "mouse bites" generation.
-- Optional milling of inner outline polygons (for example, Eagle generates ones for large drills).
-- Optional rotation and centering of the panel for the given blank board dimensions.
-- Optimization of the drill tool path.
-- Drill depth auto-adjustment.
-- Optionally mill outlines twice.
-- Optionally replace larger drills with milling. Threshold for such replacement is configurable.
-- Configurable separate scaling by X and Y axes.
+- **Single-step processing** -- mill outlines then drill holes, no re-clamping needed
+- **Multi-board panels** -- supports GerbMerge output
+- **Automatic tool diameter compensation**
+- **Tab routing with mouse bites** -- automatic placement along horizontal/vertical edges
+- **Inner outline milling** -- optional support for inner polygons (e.g. Eagle large drill slots)
+- **Panel rotation and centering** -- fits panel to blank board dimensions
+- **Drill path optimization** -- configurable 0-9 levels
+- **Drill depth auto-adjustment** -- compensates for drill point angle by diameter
+- **Double-pass outline** -- optional second pass for clean cuts
+- **Drill-to-mill replacement** -- configurable threshold for large holes
+- **Separate X/Y scaling** -- fine-tune photomask-to-PCB alignment
+- **Metric-first** -- converts imperial units where necessary
 
-This utility is for metric world, sorry. I tried to accommodate myself to imperial units, but failed, and since
-I wrote it mostly for myself, it uses metric units everywhere and converts imperial units into metric ones where
-necessary.
+### Requirements
 
-## Notes:
+**Build:** JDK 25+, Maven 3.9+. For native binary: GraalVM 25+.
 
-### Drill Depth Automatic Adjustment
-  Usually CNC is configured to have PCB surface at zero of Z coordinate. Configured drill depth in this case should
-  be close to PCB thickness. Since drill point angle is not 180 degrees, different drills need different drill
-  depth to fully penetrate the PCB. With fixed drill depth it is necessary to configure larger drill depth than
-  necessary for small drill diameters. Automatic drill depth adjustment takes care of this and increases drill depth
-  depending on the drill diameter.
+**Runtime:** None (native binary is self-contained).
 
-### Double passing of outline
-  After outline milling cuts often are filled with chips and it's quite complicated to remove chips from cuts.
-  Issue is especially visible when small diameter mills are used. Second pass completely resolves this issue.
+### Building from sources
 
-### Separate scaling by X and Y axes
-  Separate scaling (and scaling in general) is necessary to achieve perfect match between photomask and PCB.
-  Note that significant scaling (more than about few percents) can cause inability to insert through-hole components.
-
-## TODO:
-- continue work on optimization
-
-__Change log__:
-
- _(1.3.0)_
-- (fix) Switched to Java 11
-- (fix) Updated dependencies and cleaned up code base
-- (add) By default build generates native image
-
- _(1.2.0)_
-  
-- (fix) Fixed optimization of starting point of polygon cutting (sometimes one side of the polygon disappeared)
-- (add) Significantly improved support for Excellon files (experimental)
-- (add) Added drill depth auto-adjustment
-- (add) Added configurable spindle startup delay
-- (add) Added option for double passing outline
-- (add) Added option for replacement of larger drills with mills
-- (add) Added separate scaling by X and Y
-- (add) Line separator in generated file is taken as the system default instead of plain '\n'
-
-## Requirements:
-
-### Build
-- GraalVM 20.3.0
-
-### Runtime
- none
-
-## Building from sources
-Once GraalVM is installed and configured, miniCAM can be built using following 
-command:
-
-```./mvnw clean package```
-
-Built binary can be found in `./target` directory. 
-
-## Usage
-
-__Usage:__ `miniCAM <parameters>`
-
-__Parameters:__
 ```
---outline=<outline file>       - Gerber with outline
---drill=<drill file>           - Excellon-like drill file
---config=<configuration file>  - configuration file (see below)
---output=<output file>         - Combined (mill+drill) output file (WARNING: it's silently overwrites existing file if it exists)
---output-drill=<output file>   - Output file for drilling (WARNING: it's silently overwrites existing file if it exists)
---output-outline=<output file> - Output file for milling (WARNING: it's silently overwrites existing file if it exists)
+mvn clean package
 ```
 
-Configuration file is a simple text file consisting of pairs `<variable> = <value>`. Leading '#' marks start
-of the comment. Note that in-line comments (in same line as variable) are not supported.
-Sample configuration file is included in distribution package.
+The native binary is generated in `./target/miniCAM`. To skip native image and build JAR only:
 
-Following variables are recognized (all measurements are in millimeters or mm/min):
-
-General configuration variables:
 ```
-    config.free.move.feed.rate         - Speed (in mm/min) of free move of spindle.
-    config.tool.change.z               - How high spindle should be moved before tool change.
-    config.spindle.speed               - Cutting/drilling speed (in RPM).
-    config.spindle.startup.delay       - Time (in seconds) between spindle start command and first move. Necessary to let spindle
-                                         reach configured speed.
-    config.drills.diameter.step        - Drill diameter "grid" step. Default of 0.1mm means that all drills will be "snapped" to
-                                         closest diameters such as 0.2mm/0.3mm/0.4mm/etc. If you have drill bits with finer
-                                         granularity (for example, 0.05mm), set this parameter accordingly.
-    config.optimization.level          - Level of the optimization of the drill tool path. Must be in range 0-9 (0 - optimization
-                                         is disabled, 9 - maximal optimization).
-    config.drills.adjust.depth         - Enable/disable (true/false) adjustment of drill depth depending on drill diameter.
-    config.outline.double.pass         - Generate two passes for outline. It might be necessary to make cuts clean, especially if
-                                         small diameter mill is used.
-	config.mill.large.drills           - Enable/disable replacing of larger drills with mills.
-    config.mill.large.drills.threshold - Threshold for drills-to-mills replacement. All drills with diameter greater or equal
-                                         to threshold will be replaced with milling operation.
-    config.scale.x                     - Scaling factor for X axis. Scaling is specified as number (not in percents!).
-    config.scale.y                     - Scaling factor for Y axis. Scaling is specified as number (not in percents!).
+mvn clean package -DskipNativeBuild=true
 ```
 
-Output control:
+### Pre-built binaries
+
+Download native binaries for Linux, macOS, and Windows from the [Releases](../../releases) page. Binaries are automatically built and published on each tagged release.
+
+### Usage
+
 ```
-    output.generate.inner.cut - Generate G-code for inner outlines (inner board holes/slots).
-                                Cutter diameter compensation works correctly for such outlines.
-    output.board.height       - blank board height
-    output.board.width        - blank board width
-    output.board.center.panel - enable centering of the panel on the blank board
-    output.board.rotate.panel - enable rotation of the panel. Rotation tries to match direction of the blank board
-                                (i.e. longer dimension of the panel will match longer dimension of the blank).
+miniCAM --outline=<gerber file> --drill=<excellon file> --config=<config file> \
+        --output=<combined gcode>
 ```
-Tab routing parameters (NOTE: tabs are placed only at horizontal and vertical edges of the board outline!):
+
+Or generate separate mill/drill files:
+
 ```
-	tab.drill.diameter   - diameter of the holes drilled in breakaway tab. This diameter also defines "safety border" around
-	                       the board (half of the drill diameter is added to the cutter radius during calculation of tool path).
-	tab.width            - actual tab width after milling
-	tab.minimal.distance - minimal distance between tabs. If board edge is shorter than about twice of this distance, no tabs
-	                       will be generated. This parameter is used for calculation of number and position of the tabs.
+miniCAM --outline=<gerber file> --drill=<excellon file> --config=<config file> \
+        --output-mill=<mill gcode> --output-drill=<drill gcode>
 ```
-Cutting parameters:
-```
-	cut.cutter.diameter - mill bit diameter. Half of this value (i.e. cutter radius) is used to calculate tool path.
-	cut.feed.rate       - feed rate during milling
-	cut.z               - depth of the milling (if CNC is configured to have board surface to be at Z = 0, this value will
-	                      have negative value.
-	cut.safe.z          - height of the tool end when tool can safely move over PCB without cutting
-```
-Drilling parameters:
-```
-	drill.z              - depth of the drilling (similar to cut.z, see comments about it above)
-	drill.safe.z         - see (cut.safe.z) comment, used for drilling cycles.
-```
+
+### Configuration
+
+Configuration is a text file with `variable = value` pairs. Lines starting with `#` are comments.
+A sample configuration file (`minicam.cfg`) is included.
+
+All measurements are in millimeters or mm/min.
+
+#### General
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `config.free.move.feed.rate` | Free move speed (mm/min) | 400 |
+| `config.tool.change.z` | Tool change retract height (mm) | 55 |
+| `config.spindle.speed` | Spindle speed (RPM) | 60000 |
+| `config.spindle.startup.delay` | Delay after spindle start (seconds) | 5 |
+| `config.optimization.level` | Drill path optimization 0-9 | 5 |
+| `config.drills.diameter.step` | Drill diameter snap grid (mm) | 0.1 |
+| `config.drills.adjust.depth` | Auto-adjust drill depth by diameter | true |
+| `config.outline.double.pass` | Mill outline twice for clean cuts | false |
+| `config.mill.large.drills` | Replace large drills with milling | false |
+| `config.mill.large.drills.threshold` | Diameter threshold for drill-to-mill (mm) | 2.0 |
+| `config.scale.x` | X-axis scale factor | 1.0 |
+| `config.scale.y` | Y-axis scale factor | 1.0 |
+
+#### Output control
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `output.board.height` | Blank board height (mm) | 200 |
+| `output.board.width` | Blank board width (mm) | 160 |
+| `output.board.center.panel` | Center panel on blank board | true |
+| `output.board.rotate.panel` | Rotate panel to match blank orientation | true |
+| `output.generate.inner.cut` | Generate G-Code for inner outlines | false |
+
+#### Tab routing
+
+Tabs are placed only along horizontal and vertical edges.
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `tab.drill.diameter` | Mouse bite hole diameter (mm) | 0.5 |
+| `tab.width` | Tab width after milling (mm) | 5 |
+| `tab.minimal.distance` | Minimum distance between tabs (mm) | 16 |
+
+#### Cutting
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `cut.cutter.diameter` | Mill bit diameter (mm) | 1.6 |
+| `cut.feed.rate` | Milling feed rate (mm/min) | 150 |
+| `cut.z` | Milling depth (mm, negative) | -2.2 |
+| `cut.safe.z` | Safe Z height for rapid moves (mm) | 6.0 |
+
+#### Drilling
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `drill.z` | Drilling depth (mm, negative) | -2.2 |
+| `drill.safe.z` | Safe Z height for drill rapid moves (mm) | 5.0 |
+
+### Notes
+
+**Drill depth auto-adjustment:** Different drill diameters need different depths to fully penetrate the PCB due to the drill point angle. This feature automatically increases depth for smaller drills.
+
+**Double-pass outline:** Chips often fill cuts during milling, especially with small diameter mills. A second pass cleans the cuts completely.
+
+**Separate X/Y scaling:** Compensates for dimensional differences between photomask and PCB. Significant scaling (more than a few percent) can prevent through-hole component insertion.
+
+### Changelog
+
+#### 2.0.0
+
+- Modernized to Java 25 (from Java 11)
+- Updated GraalVM native image build to `org.graalvm.buildtools:native-maven-plugin` 0.11.4
+- Migrated tests from JUnit 4 to JUnit 5.14.3
+- Updated Log4j to 2.25.3
+- Updated all Maven plugins to latest versions
+- Added JaCoCo code coverage (85%+ excluding generated parser code)
+- Added GitHub Actions CI (build + test on push/PR)
+- Added GitHub Actions release workflow (native binaries for Linux, macOS, Windows on tag push)
+- Removed Maven wrapper (use system Maven)
+
+#### 1.3.0
+
+- Switched to Java 11
+- Updated dependencies and cleaned up code base
+- Build generates native image by default
+
+#### 1.2.0
+
+- Fixed optimization of polygon cutting start point
+- Improved Excellon file support (experimental)
+- Added drill depth auto-adjustment
+- Added configurable spindle startup delay
+- Added double-pass outline option
+- Added drill-to-mill replacement option
+- Added separate X/Y scaling
+- Line separator uses system default
+
+### License
+
+Apache License 2.0

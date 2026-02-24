@@ -1,14 +1,14 @@
 
 package com.baremetalstudios.minicam.parser;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.baremetalstudios.minicam.simulator.OutlinePlotter;
 

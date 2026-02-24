@@ -1,12 +1,12 @@
 package com.baremetalstudios.minicam.processor;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.baremetalstudios.minicam.config.OutputConfig;
 import com.baremetalstudios.minicam.geometry.Direction;

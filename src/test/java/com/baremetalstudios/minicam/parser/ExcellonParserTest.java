@@ -1,13 +1,13 @@
 package com.baremetalstudios.minicam.parser;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.baremetalstudios.minicam.geometry.DrillGroup;
 import com.baremetalstudios.minicam.geometry.Point;

@@ -1,14 +1,13 @@
 package com.baremetalstudios.minicam.geometry;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import com.baremetalstudios.minicam.config.OutputConfig;
 import com.baremetalstudios.minicam.parser.ExcellonParser;

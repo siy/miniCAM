@@ -175,7 +175,7 @@ public class MiniCAM {
     }
 
     private void banner() {
-        System.out.println("MiniCAM 1.2.0");
+        System.out.println("MiniCAM 2.0.0");
         System.out.println();
     }
 

@@ -1,13 +1,11 @@
 package com.baremetalstudios.minicam.config;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.BufferedReader;
 import java.io.CharArrayReader;
 
-import org.junit.Test;
-
-import com.baremetalstudios.minicam.config.ConfigurationReader;
+import org.junit.jupiter.api.Test;
 
 
 public class ConfigurationReaderTest {
