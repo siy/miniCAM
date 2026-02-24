@@ -155,7 +155,7 @@ public class OutputGenerator {
     }
 
     private void generatePostamble() {
-        writer.println();
+        writer.print(config.getSeparator());
         toolChangeRetract();
         writer.printf("M5 ( Spindle stop. )%s", config.getSeparator());
         writer.printf("M9 ( Coolant off. )%s", config.getSeparator());
